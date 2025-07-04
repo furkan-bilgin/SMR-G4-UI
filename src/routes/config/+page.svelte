@@ -41,10 +41,7 @@
 	}
 </script>
 
-<form
-	class="bg-base-200 mx-auto max-w-2xl space-y-8 rounded-lg p-6 shadow"
-	on:submit|preventDefault={handleSubmit}
->
+<form on:submit|preventDefault={handleSubmit}>
 	<!-- Core Section -->
 	<section>
 		<h2 class="mb-4 text-xl font-bold">Core</h2>

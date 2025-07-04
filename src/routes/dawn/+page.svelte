@@ -96,32 +96,27 @@
 	};
 </script>
 
-<div class="bg-base-200 flex min-h-screen w-full flex-col font-sans">
-	<header class="bg-base-100 z-10 rounded-b p-4 shadow">
-		<h1 class="text-base-content text-center text-2xl font-bold">SMR-G4</h1>
-	</header>
-	<main class="relative flex flex-1 flex-col items-center p-4">
-		<div class="mb-4 w-full max-w-md">
-			<label for="file-upload" class="sr-only">Upload a .pawn file</label>
-			<input
-				id="file-upload"
-				type="file"
-				accept=".pawn,.dawn,.prim"
-				on:change={handleFileChange}
-				class="file-input file-input-bordered w-full"
-			/>
-		</div>
+<div class="mb-4 w-full max-w-md">
+	<label for="file-upload" class="sr-only">Upload a .pawn file</label>
+	<input
+		id="file-upload"
+		type="file"
+		accept=".pawn,.dawn,.prim"
+		on:change={handleFileChange}
+		class="file-input file-input-bordered w-full"
+	/>
+</div>
 
+<div
+	bind:this={mountRef}
+	class="border-base-300 bg-base-100 h-full w-full rounded border shadow"
+	style="min-height: 800px;"
+></div>
+
+<div class="pointer-events-none absolute inset-0 h-full w-full">
+	{#each twoDTexts as textObj, index (index)}
 		<div
-			bind:this={mountRef}
-			class="border-base-300 bg-base-100 h-full w-full rounded border shadow"
-			style="min-height: 400px;"
-		></div>
-
-		<div class="pointer-events-none absolute inset-0 h-full w-full">
-			{#each twoDTexts as textObj, index (index)}
-				<div
-					style="
+			style="
 						position: absolute;
 						left: {textObj.x}mm;
 						bottom: {textObj.y}mm;
@@ -131,10 +126,8 @@
 						white-space: nowrap;
 						pointer-events: none;
 					"
-				>
-					{textObj.text}
-				</div>
-			{/each}
+		>
+			{textObj.text}
 		</div>
-	</main>
+	{/each}
 </div>
