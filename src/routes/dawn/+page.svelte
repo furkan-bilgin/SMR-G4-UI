@@ -1,5 +1,4 @@
 <script lang="ts">
-	import "../app.css";
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -96,12 +95,13 @@
 		}
 	};
 </script>
-<div class="flex flex-col min-h-screen bg-base-200 font-sans w-full">
-	<header class="bg-base-100 shadow p-4 z-10 rounded-b">
-		<h1 class="text-2xl font-bold text-center text-base-content">SMR-G4-UI Dawnfile Renderer</h1>
+
+<div class="bg-base-200 flex min-h-screen w-full flex-col font-sans">
+	<header class="bg-base-100 z-10 rounded-b p-4 shadow">
+		<h1 class="text-base-content text-center text-2xl font-bold">SMR-G4</h1>
 	</header>
-	<main class="flex-1 flex flex-col items-center p-4 relative">
-		<div class="w-full max-w-md mb-4">
+	<main class="relative flex flex-1 flex-col items-center p-4">
+		<div class="mb-4 w-full max-w-md">
 			<label for="file-upload" class="sr-only">Upload a .pawn file</label>
 			<input
 				id="file-upload"
@@ -114,11 +114,11 @@
 
 		<div
 			bind:this={mountRef}
-			class="w-full h-full border border-base-300 rounded shadow bg-base-100"
+			class="border-base-300 bg-base-100 h-full w-full rounded border shadow"
 			style="min-height: 400px;"
 		></div>
 
-		<div class="absolute inset-0 w-full h-full pointer-events-none">
+		<div class="pointer-events-none absolute inset-0 h-full w-full">
 			{#each twoDTexts as textObj, index (index)}
 				<div
 					style="
