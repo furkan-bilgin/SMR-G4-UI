@@ -41,7 +41,7 @@
 	}
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form class="max-w-2xl" on:submit|preventDefault={handleSubmit}>
 	<!-- Core Section -->
 	<section>
 		<h2 class="mb-4 text-xl font-bold">Core</h2>
