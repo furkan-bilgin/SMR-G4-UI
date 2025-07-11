@@ -38,6 +38,7 @@
 	"type": "module",
 	"dependencies": {
 		"@types/three": "^0.178.0",
+		"axios": "^1.10.0",
 		"three": "^0.178.0"
 	}
 }

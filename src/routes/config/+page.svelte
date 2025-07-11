@@ -1,4 +1,6 @@
 <script lang="ts">
+	import api from '$lib/api';
+
 	export let config = {
 		core_shape: 'cylinder',
 		core_height_cm: 250.0,
@@ -37,7 +39,9 @@
 	};
 
 	function handleSubmit() {
-		console.log('Configuration submitted:', config);
+		api.post('/schedule', { job_config: config }).then((res: any) => {
+			window.location.href = `/job/${res.data.job_id}`;
+		});
 	}
 </script>
 
@@ -322,6 +326,8 @@
 	</section>
 
 	<div class="pt-6">
-		<button class="btn btn-primary w-full py-3 font-bold" type="submit"> Save Config </button>
+		<button class="btn btn-primary w-full py-3 font-bold" type="submit">
+			Schedule Simulation
+		</button>
 	</div>
 </form>
