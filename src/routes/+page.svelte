@@ -14,7 +14,7 @@
 	});
 </script>
 
-<section class="w-2xl">
+<section class="w-3xl">
 	<div class="flex flex-col">
 		<div class="mb-2 flex flex-row items-center justify-between">
 			<span class="text-2xl">Simulations</span>
