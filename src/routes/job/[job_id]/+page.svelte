@@ -19,6 +19,11 @@
 			const res = await api.get(`/jobs/${jobId}`);
 			job = res.data.job;
 			jobOutput = job.job_output || '';
+			if (job.completed_at) {
+				const localDate = new Date(job.completed_at + 'Z');
+				jobOutput += '\n\nJob completed at ' + localDate.toLocaleString();
+				return; // No need to stream if the job is already completed
+			}
 			// Start streaming
 			const jobOutputStream = await api.get(`/jobs/${jobId}/stream`, {
 				adapter: 'fetch',
