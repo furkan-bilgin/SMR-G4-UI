@@ -64,7 +64,7 @@
 		try {
 			const res = await api.get(`/jobs/${jobId}`);
 			job = res.data.job;
-			jobOutput = job.job_output || '';
+			jobOutput = (job.job_output || '').trim();
 			if (job.completed_at) {
 				job.completed_at = new Date(job.completed_at + 'Z').toLocaleString();
 				return; // No need to stream if the job is already completed
@@ -106,8 +106,7 @@
 			<pre
 				class="max-w-xl overflow-y-auto rounded-lg p-4 font-mono text-sm"
 				style="max-height: 600px;"
-				bind:this={jobOutputContainer}>
-        {jobOutput}
+				bind:this={jobOutputContainer}>{jobOutput}
 				{#if job.completed_at}
 					<p class="text-sm text-green-300">Job completed at {job.completed_at}</p>
 				{/if}

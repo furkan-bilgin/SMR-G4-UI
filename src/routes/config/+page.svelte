@@ -1,5 +1,6 @@
 <script lang="ts">
 	import api from '$lib/api';
+	import { onMount } from 'svelte';
 
 	export let config: Record<string, any> = {
 		core_shape: 'cylinder',
@@ -14,6 +15,7 @@
 			pin_radius_cm: 3.5,
 			pin_height_cm: 50.0,
 			fuel_material: 'UO2_enriched',
+			FuelPinCount: 100, // Added for hexagonal layout
 			control_rod_positions: [
 				[0, 0],
 				[1, 1],
@@ -48,6 +50,17 @@
 		}
 	};
 	let isSubmitting = false;
+	let availableMaterials: string[] = [
+		'G4_WATER',
+		'G4_Si',
+		'G4_AIR',
+		'G4_GRAPHITE',
+		'G4_STAINLESS-STEEL',
+		'G4_POLYETHYLENE',
+		'G4_CONCRETE',
+		'UO2_enriched',
+		'B4C'
+	];
 
 	function getInputType(value: any) {
 		if (typeof value === 'number') {
@@ -66,63 +79,142 @@
 			window.location.href = `/job/${res.data.job_id}`;
 		});
 	}
+
+	// Helper function to capitalize words
+	function capitalizeWords(str: string) {
+		return str
+			.replace(/_cm$/, ' (cm)')
+			.replace(/_/g, ' ')
+			.split(' ')
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+			.join(' ');
+	}
 </script>
 
 <form class="w-3xl" on:submit|preventDefault={handleSubmit}>
+	<section>
+		<h2 class="mb-4 text-xl font-bold">Core Shape</h2>
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+			<div>
+				<label for="core_shape" class="mb-1 block font-medium">Core Shape</label>
+				<select
+					class="select select-bordered w-full"
+					bind:value={config.core_shape}
+					id="core_shape"
+				>
+					<option value="cylinder">Cylinder</option>
+					<option value="box">Box</option>
+					<option value="sphere">Sphere</option>
+				</select>
+			</div>
+		</div>
+	</section>
+	<hr class="my-3" />
+
 	{#each Object.entries(config) as [key, value]}
-		{#if typeof value === 'object' && !Array.isArray(value)}
+		{#if key !== 'core_shape' && typeof value === 'object' && !Array.isArray(value)}
 			<section>
 				<h2 class="mb-4 text-xl font-bold">
-					{key
-						.replace(/_/g, ' ')
-						.split(' ')
-						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-						.join(' ')}
+					{capitalizeWords(key)}
 				</h2>
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 					{#each Object.entries(value) as [subKey, subValue]}
 						{#if !Array.isArray(subValue)}
-							<div>
-								<label for="{key}-{subKey}" class="mb-1 block font-medium">
-									{subKey
-										.replace(/_cm$/, ' (cm)')
-										.replace(/_/g, ' ')
-										.split(' ')
-										.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-										.join(' ')}
-								</label>
-								{#if getInputType(subValue) === 'checkbox'}
-									<input
-										type="checkbox"
-										class="checkbox checkbox-primary"
-										id="{key}-{subKey}"
-										bind:checked={value[subKey]}
-									/>
-								{:else if subKey === 'layout' || subKey === 'core_shape'}
-									<select class="select select-bordered w-full" bind:value={value[subKey]}>
-										<option value={subValue}>
-											{(subValue as string).charAt(0).toUpperCase() + (subValue as string).slice(1)}
-										</option>
-									</select>
-								{:else}
-									<input
-										type={getInputType(subValue)}
-										class="input input-bordered w-full"
-										id="{key}-{subKey}"
-										bind:value={value[subKey]}
-										min={getInputType(subValue) === 'number' ? '0' : undefined}
-										step={getInputType(subValue) === 'number' ? 'any' : undefined}
-									/>
+							{#if key === 'fuel_pins'}
+								{#if subKey === 'layout'}
+									<div>
+										<label for="{key}-{subKey}" class="mb-1 block font-medium">
+											{capitalizeWords(subKey)}
+										</label>
+										<select class="select select-bordered w-full" bind:value={value[subKey]}>
+											<option value="square">Square</option>
+											<option value="hexagonal">Hexagonal</option>
+										</select>
+									</div>
+								{:else if value.layout === 'square' && ['rows', 'cols', 'pin_pitch_cm', 'pin_radius_cm', 'pin_height_cm', 'fuel_material'].includes(subKey)}
+									<div>
+										<label for="{key}-{subKey}" class="mb-1 block font-medium">
+											{capitalizeWords(subKey)}
+										</label>
+										{#if subKey === 'fuel_material'}
+											<select class="select select-bordered w-full" bind:value={value[subKey]}>
+												{#each availableMaterials as material}
+													<option value={material}>{material}</option>
+												{/each}
+											</select>
+										{:else}
+											<input
+												type={getInputType(subValue)}
+												class="input input-bordered w-full"
+												id="{key}-{subKey}"
+												bind:value={value[subKey]}
+												min={getInputType(subValue) === 'number' ? '0' : undefined}
+												step={getInputType(subValue) === 'number' ? 'any' : undefined}
+											/>
+										{/if}
+									</div>
+								{:else if value.layout === 'hexagonal' && ['pin_pitch_cm', 'pin_radius_cm', 'pin_height_cm', 'FuelPinCount', 'fuel_material'].includes(subKey)}
+									<div>
+										<label for="{key}-{subKey}" class="mb-1 block font-medium">
+											{capitalizeWords(subKey)}
+										</label>
+										{#if subKey === 'fuel_material'}
+											<select class="select select-bordered w-full" bind:value={value[subKey]}>
+												{#each availableMaterials as material}
+													<option value={material}>{material}</option>
+												{/each}
+											</select>
+										{:else}
+											<input
+												type={getInputType(subValue)}
+												class="input input-bordered w-full"
+												id="{key}-{subKey}"
+												bind:value={value[subKey]}
+												min={getInputType(subValue) === 'number' ? '0' : undefined}
+												step={getInputType(subValue) === 'number' ? 'any' : undefined}
+											/>
+										{/if}
+									</div>
 								{/if}
-							</div>
+							{:else if (subKey === 'material' || subKey === 'control_rod_material') && availableMaterials.length > 0}
+								<div>
+									<label for="{key}-{subKey}" class="mb-1 block font-medium">
+										{capitalizeWords(subKey)}
+									</label>
+									<select class="select select-bordered w-full" bind:value={value[subKey]}>
+										{#each availableMaterials as material}
+											<option value={material}>{material}</option>
+										{/each}
+									</select>
+								</div>
+							{:else if subKey !== 'layout'}
+								<div>
+									<label for="{key}-{subKey}" class="mb-1 block font-medium">
+										{capitalizeWords(subKey)}
+									</label>
+									{#if getInputType(subValue) === 'checkbox'}
+										<input
+											type="checkbox"
+											class="checkbox checkbox-primary"
+											id="{key}-{subKey}"
+											bind:checked={value[subKey]}
+										/>
+									{:else}
+										<input
+											type={getInputType(subValue)}
+											class="input input-bordered w-full"
+											id="{key}-{subKey}"
+											bind:value={value[subKey]}
+											min={getInputType(subValue) === 'number' ? '0' : undefined}
+											step={getInputType(subValue) === 'number' ? 'any' : undefined}
+										/>
+									{/if}
+								</div>
+							{/if}
 						{:else if Array.isArray(subValue) && subKey === 'control_rod_positions'}
 							<div class="mt-4">
 								<label for="{key}-{subKey}" class="mb-1 block font-medium">
-									{subKey
-										.replace(/_/g, ' ')
-										.split(' ')
-										.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-										.join(' ')}
+									{capitalizeWords(subKey)}
 								</label>
 								<div class="flex flex-wrap gap-2" id="{key}-{subKey}">
 									{#each subValue as pos, i (i)}
@@ -147,6 +239,7 @@
 												class="btn btn-xs btn-error ml-1"
 												on:click={() => {
 													value[subKey].splice(i, 1);
+													// Reassign to trigger reactivity for array removal
 													value[subKey] = [...value[subKey]];
 												}}>✕</button
 											>
@@ -158,6 +251,7 @@
 											class="btn btn-xs btn-primary"
 											on:click={() => {
 												value[subKey].push([0, 0]);
+												// Reassign to trigger reactivity for array addition
 												value[subKey] = [...value[subKey]];
 											}}>+ Add</button
 										>

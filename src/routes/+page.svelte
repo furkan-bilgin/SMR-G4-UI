@@ -3,15 +3,25 @@
 	import { onMount } from 'svelte';
 
 	let jobs: any[] | null = null;
-	onMount(async () => {
-		jobs = await api
-			.get('/jobs')
-			.then((res) => res.data.jobs)
-			.catch((err) => {
-				console.error('Error fetching jobs:', err);
-				return null;
-			});
-	});
+	async function fetchJobs() {
+		try {
+			const response = await api.get('/jobs');
+			jobs = response.data.jobs;
+		} catch (error) {
+			console.error('Error fetching jobs:', error);
+			jobs = null;
+		}
+	}
+	onMount(async () => fetchJobs());
+
+	async function deleteJob(jobId: string) {
+		try {
+			await api.delete(`/jobs/${jobId}`);
+			await fetchJobs();
+		} catch (err) {
+			console.error('Error deleting job:', err);
+		}
+	}
 </script>
 
 <section class="w-3xl">
@@ -26,16 +36,17 @@
 					<th class="w-1/3">ID</th>
 					<th>Run Date</th>
 					<th>Status</th>
+					<th>Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#if jobs === null}
 					<tr class="text-center">
-						<td colspan="3"> <span class="loading loading-spinner loading-md"></span></td>
+						<td colspan="4"> <span class="loading loading-spinner loading-md"></span></td>
 					</tr>
 				{:else if jobs.length === 0}
 					<tr class="text-center">
-						<td colspan="3">No simulations found</td>
+						<td colspan="4">No simulations found</td>
 					</tr>
 				{:else}
 					{#each jobs as job}
@@ -54,6 +65,11 @@
 								{:else}
 									<span class="badge badge-warning">Pending</span>
 								{/if}
+							</td>
+							<td>
+								<button class="btn btn-xs btn-error" on:click={() => deleteJob(job.id)}>
+									<i class="fa-solid fa-trash"></i>
+								</button>
 							</td>
 						</tr>
 					{/each}
