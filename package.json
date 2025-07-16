@@ -39,6 +39,7 @@
 	"dependencies": {
 		"@types/three": "^0.178.0",
 		"axios": "^1.10.0",
+		"svelte-plotly.js": "^1.2.0",
 		"three": "^0.178.0"
 	}
 }

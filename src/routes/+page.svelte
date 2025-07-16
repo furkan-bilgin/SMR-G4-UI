@@ -23,24 +23,28 @@
 		<table class="table table-auto">
 			<thead>
 				<tr>
-					<th class="w-1/2">ID</th>
+					<th class="w-1/3">ID</th>
+					<th>Run Date</th>
 					<th>Status</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#if jobs === null}
 					<tr class="text-center">
-						<td colspan="2"> <span class="loading loading-spinner loading-md"></span></td>
+						<td colspan="3"> <span class="loading loading-spinner loading-md"></span></td>
 					</tr>
 				{:else if jobs.length === 0}
 					<tr class="text-center">
-						<td colspan="2">No simulations found</td>
+						<td colspan="3">No simulations found</td>
 					</tr>
 				{:else}
 					{#each jobs as job}
 						<tr>
 							<td>
 								<a href={`/job/${job.id}`}>{job.id}</a>
+							</td>
+							<td>
+								{new Date(job.created_at + 'Z').toLocaleString()}
 							</td>
 							<td>
 								{#if job.is_processing}

@@ -3,36 +3,57 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { element } from 'three/tsl';
-	import DawnFileRenderer from '$lib/DawnFileRenderer.svelte';
+	import DawnFileRenderer from './DawnFileRenderer.svelte';
+	import PlotRenderer from './PlotRenderer.svelte';
 	const jobId = page.params.job_id;
 	let job: any | Error | null = null;
 	let jobOutput = '';
 	let jobOutputContainer: HTMLPreElement;
 	let jobGeometry: string | null = null;
+	let jobPlotData: any | null = null;
 
 	$: {
 		if (jobOutput && jobOutputContainer) {
 			jobOutputContainer.scrollTop = jobOutputContainer.scrollHeight;
+			if (jobOutput.includes('Geometry rendered successfully')) {
+				getGeometry();
+			}
+			if (jobOutput.includes('Job completed successfully')) {
+				getPlots();
+			}
 		}
 	}
 
-	async function pollGeometry() {
+	async function getGeometry() {
 		if (jobGeometry) {
 			return;
 		}
-		let geometryData;
-		try {
-			geometryData = await api.get(`/output/${jobId}/geometry.prim`);
-		} catch (err) {
-			// Means the geometry file is not available yet
-			return;
-		}
-		jobGeometry = geometryData.data;
-		clearInterval(geometryPollInterval);
+		jobGeometry = (await api.get(`/output/${jobId}/geometry.prim`)).data;
 	}
 
-	const geometryPollInterval = setInterval(pollGeometry, 1000);
-	pollGeometry();
+	async function getPlots() {
+		if (jobPlotData) {
+			return;
+		}
+		const plotFiles = [
+			'event_positions.csv',
+			'fission_secondary_distribution.csv',
+			'material_event_counts.csv',
+			'neutron_energies.csv',
+			'simulation_summary.csv'
+		];
+		let data: Record<string, string> = {};
+		for (const file of plotFiles) {
+			try {
+				const res = await api.get(`/output/${jobId}/${file}`);
+				data[file] = res.data;
+			} catch (err) {
+				console.error(`Error fetching plot data for ${file}:`, err);
+				continue;
+			}
+		}
+		jobPlotData = data;
+	}
 
 	onMount(async () => {
 		try {
@@ -98,9 +119,13 @@
 	</div>
 	<div class="flex flex-1/3 flex-col">
 		<span class="mb-2 text-xl">Plots</span>
-		<span class="text-sm text-gray-500">
-			<i class="fa-solid fa-circle-info"></i>
-			Plots will be available after the job is completed.
-		</span>
+		{#if jobPlotData}
+			<PlotRenderer plotData={jobPlotData} />
+		{:else}
+			<span class="text-sm text-gray-500">
+				<i class="fa-solid fa-circle-info"></i>
+				Plots will be available after the job is completed.
+			</span>
+		{/if}
 	</div>
 </section>
