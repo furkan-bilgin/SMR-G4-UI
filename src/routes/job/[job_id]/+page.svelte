@@ -14,13 +14,14 @@
 
 	$: {
 		if (jobOutput && jobOutputContainer) {
-			jobOutputContainer.scrollTop = jobOutputContainer.scrollHeight;
 			if (jobOutput.includes('Geometry rendered successfully')) {
 				getGeometry();
 			}
 			if (jobOutput.includes('Job completed successfully')) {
 				getPlots();
+				getJob();
 			}
+			jobOutputContainer.scrollTop = jobOutputContainer.scrollHeight;
 		}
 	}
 
@@ -54,8 +55,12 @@
 		}
 		jobPlotData = data;
 	}
+	const dataxyz = {
+		x: [1, 2, 3, 4, 5],
+		y: [1, 2, 4, 8, 16]
+	};
 
-	onMount(async () => {
+	async function getJob() {
 		try {
 			const res = await api.get(`/jobs/${jobId}`);
 			job = res.data.job;
@@ -80,7 +85,9 @@
 		} catch (err) {
 			job = err;
 		}
-	});
+	}
+
+	onMount(getJob);
 </script>
 
 <span class="mb-4 text-2xl">Job #{jobId}</span>

@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
-	import Plot from 'svelte-plotly.js'; // Import the Plot component
+	import { onDestroy, onMount } from 'svelte';
+	import ScatterPlot from '$lib/ScatterPlot.svelte';
 
 	export let plotData: Record<string, string> | null = null;
 
@@ -25,12 +24,7 @@
 	];
 
 	// Store for parsed data
-	let parsedData: Record<string, any[]> = {};
-
-	// Data, layout, and config for the Plotly plot
-	let plotlyData: Plotly.Data[] = [];
-	let plotlyLayout: Partial<Plotly.Layout> = {};
-	let plotlyConfig: Partial<Plotly.Config> = { responsive: true };
+	let parsedData: Record<string, any> = {};
 
 	// Reactive block to parse data and prepare plot data when plotData changes
 	$: if (plotData) {
@@ -44,46 +38,21 @@
 		preparePlotlyData();
 	}
 
-	function preparePlotlyData() {
+	async function preparePlotlyData() {
 		const eventPositionsData = parsedData['event_positions.csv'];
 		if (eventPositionsData && eventPositionsData.length > 0) {
-			const x = eventPositionsData.map((d) => parseFloat(d.x_cm));
-			const y = eventPositionsData.map((d) => parseFloat(d.y_cm));
-			const z = eventPositionsData.map((d) => parseFloat(d.z_cm));
-			plotlyData = [
-				{
-					x: x,
-					y: y,
-					z: z,
-					mode: 'markers',
-					marker: {
-						size: 3,
-						opacity: 0.8
-					},
-					type: 'scatter3d' // Specify 3D scatter plot type
-				}
-			];
-
-			plotlyLayout = {
-				title: 'Event Positions 3D Scatter Plot',
-				scene: {
-					xaxis: { title: 'X' },
-					yaxis: { title: 'Y' },
-					zaxis: { title: 'Z' }
-				},
-				margin: {
-					l: 0,
-					r: 0,
-					b: 0,
-					t: 40
-				}
-			};
-		} else {
-			// Clear plot data if no event positions data is available
-			plotlyData = [];
-			plotlyLayout = {};
+			const x = eventPositionsData.map((d: any) => parseFloat(d.x_cm));
+			const y = eventPositionsData.map((d: any) => parseFloat(d.y_cm));
+			const z = eventPositionsData.map((d: any) => parseFloat(d.z_cm));
+			parsedData['event_positions.csv'] = { x, y, z };
 		}
 	}
+
+	onDestroy(() => {
+		lightningCharts.forEach((chart) => chart.dispose());
+	});
+
+	const lightningCharts: any[] = [];
 </script>
 
 {#if !plotData}
@@ -95,15 +64,10 @@
 		{#each plotFiles as { file, title, plotType }}
 			<div class="bg-base-200 rounded-lg border p-4">
 				<h3 class="mb-2 font-semibold">{title}</h3>
-				{#if parsedData[file]?.length}
-					{#if plotType === '3dScatter' && file === 'event_positions.csv'}
-						<div class="h-96 w-full">
-							<Plot
-								data={plotlyData}
-								layout={plotlyLayout}
-								config={plotlyConfig}
-								fillParent={true}
-							/>
+				{#if parsedData[file]?.length || parsedData[file]?.x?.length}
+					{#if file === 'event_positions.csv'}
+						<div class="pb-4">
+							<ScatterPlot data={parsedData[file]} />
 						</div>
 					{:else}
 						<div class="overflow-x-auto">

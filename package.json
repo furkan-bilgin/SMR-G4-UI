@@ -22,7 +22,7 @@
 		"tailwindcss": "^4.1.11",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.20.0",
-		"vite": "^6.2.6"
+		"vite": "6.3.5"
 	},
 	"private": true,
 	"scripts": {
@@ -37,9 +37,11 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@types/three": "^0.178.0",
+		"@lightningchart/lcjs": "^7.1.2",
+		"@types/plotly.js-dist-min": "^2.3.4",
+		"@types/three": "^0.178.1",
 		"axios": "^1.10.0",
-		"svelte-plotly.js": "^1.2.0",
+		"plotly.js-dist-min": "^3.0.1",
 		"three": "^0.178.0"
 	}
 }
