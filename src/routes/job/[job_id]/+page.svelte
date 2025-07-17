@@ -83,6 +83,24 @@
 			job = err;
 		}
 	}
+	let isDownloadingJobTar = false;
+
+	async function downloadJobTar() {
+		isDownloadingJobTar = true;
+		const res = await api.get(`/jobs/${jobId}/download/tar`, {
+			responseType: 'blob'
+		});
+		const blob = new Blob([res.data], { type: 'application/gzip' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `job_${jobId}_output.tar.gz`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+		isDownloadingJobTar = false;
+	}
 
 	onMount(getJob);
 </script>
@@ -141,15 +159,24 @@
 	<div class="flex flex-1/3 flex-col">
 		<span class="mb-2 flex justify-between border-b-2 border-gray-300 pb-1 text-xl shadow-sm">
 			Plots
-			{#if !fullScreenPlots}
-				<button on:click={() => (fullScreenPlots = true)} aria-label="View plots in full screen">
-					<i class="fa-solid fa-expand"></i>
+			<div class="flex gap-2">
+				{#if !fullScreenPlots}
+					<button on:click={() => (fullScreenPlots = true)} aria-label="View plots in full screen">
+						<i class="fa-solid fa-expand"></i>
+					</button>
+				{:else}
+					<button on:click={() => (fullScreenPlots = false)} aria-label="Exit full screen plots">
+						<i class="fa-solid fa-compress"></i>
+					</button>
+				{/if}
+				<button on:click={downloadJobTar} aria-label="Download all plots">
+					{#if isDownloadingJobTar}
+						<span class="loading loading-spinner loading-sm"></span>
+					{:else}
+						<i class="fa-solid fa-download"></i>
+					{/if}
 				</button>
-			{:else}
-				<button on:click={() => (fullScreenPlots = false)} aria-label="Exit full screen plots">
-					<i class="fa-solid fa-compress"></i>
-				</button>
-			{/if}
+			</div>
 		</span>
 
 		{#if jobPlotData}
