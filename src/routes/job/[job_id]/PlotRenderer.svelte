@@ -78,10 +78,11 @@
 					mode: 'markers',
 					type: 'scatter3d',
 					marker: {
-						size: 3,
+						size: 2,
 						opacity: 0.8,
 						color: colorValue,
-						colorscale: 'Viridis'
+						colorscale: 'Viridis',
+						symbol: 'x'
 					},
 					name: type,
 					showlegend: true
@@ -92,7 +93,7 @@
 						y,
 						mode: 'markers',
 						type: 'scatter',
-						marker: { size: 3, color: colorValue },
+						marker: { size: 6, color: colorValue, symbol: 'x' },
 						name: type
 					});
 					xzData.push({
@@ -100,7 +101,7 @@
 						z,
 						mode: 'markers',
 						type: 'scatter',
-						marker: { size: 3, color: colorValue },
+						marker: { size: 6, color: colorValue, symbol: 'x' },
 						name: type
 					});
 				}
