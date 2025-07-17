@@ -162,9 +162,11 @@
 						<table class="table-zebra table-xs table">
 							<thead>
 								<tr>
-									{#each Object.keys(parsedData[file][0]) as col}
-										<th>{col}</th>
-									{/each}
+									{#if parsedData[file] && parsedData[file][0]}
+										{#each Object.keys(parsedData[file][0]) as col}
+											<th>{col}</th>
+										{/each}
+									{/if}
 								</tr>
 							</thead>
 							<tbody>
