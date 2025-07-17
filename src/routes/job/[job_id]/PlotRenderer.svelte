@@ -24,7 +24,7 @@
 		{ file: 'simulation_summary.csv', title: 'Simulation Summary' }
 	];
 
-	const plotFileTitles = {
+	const plotFileTitles: Record<string, string> = {
 		...plotFiles.reduce(
 			(acc, { file, title }) => {
 				acc[file] = title;
