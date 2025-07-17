@@ -39,6 +39,7 @@
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^6.7.2",
 		"@lightningchart/lcjs": "^7.1.2",
+		"@sveltejs/adapter-node": "^5.2.13",
 		"@types/plotly.js-dist-min": "^2.3.4",
 		"@types/three": "^0.178.1",
 		"axios": "^1.10.0",
