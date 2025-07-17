@@ -76,7 +76,7 @@
 	function handleSubmit() {
 		isSubmitting = true;
 		api.post('/schedule', { job_config: config }).then((res: any) => {
-			window.location.href = `/job/${res.data.job_id}`;
+			window.location.href = `/SMR-G4/job/${res.data.job_id}`;
 		});
 	}
 

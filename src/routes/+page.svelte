@@ -1,5 +1,6 @@
 <script lang="ts">
 	import api from '$lib/api';
+	import Link from '$lib/Link.svelte';
 	import { onMount } from 'svelte';
 
 	let jobs: any[] | null = null;
@@ -28,7 +29,7 @@
 	<div class="flex flex-col">
 		<div class="mb-2 flex flex-row items-center justify-between">
 			<span class="text-2xl">Simulations</span>
-			<a class="btn bg-primary" href="/config">+ Run New Simulation</a>
+			<Link className="btn bg-primary" to="/config">+ Run New Simulation</Link>
 		</div>
 		<table class="table table-auto">
 			<thead>
@@ -52,7 +53,7 @@
 					{#each jobs as job}
 						<tr>
 							<td>
-								<a href={`/job/${job.id}`}>{job.id}</a>
+								<Link to={`/job/${job.id}`}>{job.id}</Link>
 							</td>
 							<td>
 								{new Date(job.created_at + 'Z').toLocaleString()}

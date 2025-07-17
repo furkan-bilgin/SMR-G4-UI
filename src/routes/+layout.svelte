@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Link from '$lib/Link.svelte';
 	import '../app.css';
 
 	let { children } = $props();
@@ -14,7 +15,7 @@
 			class="inline-block align-middle"
 			width="65"
 		/>
-		<a href="/" class="text-base-content text-2xl font-bold"> SMR-G4</a>
+		<Link to="/" className="text-xl font-bold">SMR-G4</Link>
 		<div></div>
 	</header>
 	<main class="relative flex flex-1 flex-col items-center p-4">
