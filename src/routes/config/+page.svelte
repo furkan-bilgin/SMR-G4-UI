@@ -1,50 +1,54 @@
 <script lang="ts">
 	import api from '$lib/api';
+	import ArrayEditor from '$lib/arrays/ArrayEditor.svelte';
 	import { onMount } from 'svelte';
 
 	export let config: Record<string, any> = {
 		core_shape: 'cylinder',
+		core_height_cm: 500.0,
+		core_radius_cm: 250.0,
 
 		fuel_pins: {
-			layout: 'square',
+			layout: 'hexagonal',
 			rows: 5,
 			cols: 5,
-			pin_pitch_cm: 30.0,
+			pin_pitch_cm: 20.0,
 			pin_radius_cm: 3.5,
-			pin_height_cm: 50.0,
+			pin_height_cm: 200.0,
+			FuelPinCount: 16,
 			fuel_material: 'UO2_enriched',
-			FuelPinCount: 100, // Added for hexagonal layout
+
 			control_rod_positions: [
 				[0, 0],
-				[1, 1],
-				[2, 2],
-				[3, 3],
-				[4, 2],
-				[3, 2]
+				[1, 0],
+				[-1, 0]
 			]
 		},
+
 		control_rods: {
-			radius_cm: 10.5,
-			height_cm: 50.0,
-			z_offset_cm: 30.0,
+			radius_cm: 3.5,
+			height_cm: 200.0,
 			control_rod_material: 'B4C'
 		},
+
 		reflector: {
-			enabled: true,
+			enabled: false,
 			material: 'G4_GRAPHITE',
 			thickness_cm: 20.0
 		},
+
 		pressure_vessel: {
-			enabled: true,
+			enabled: false,
 			material: 'G4_STAINLESS-STEEL',
 			thickness_cm: 20.0
 		},
+
 		primary_particle: {
 			type: 'neutron',
-			energy_MeV: 0.025,
-			position_cm: [0, 0, 0],
-			random_direction: true,
-			direction: [0, 0, 1]
+			energy_MeV: 0.000000025,
+			position_cm: [0, 0, 300],
+			direction: [0, 0, -1],
+			random_direction: false
 		}
 	};
 	let isSubmitting = false;
@@ -146,7 +150,6 @@
 												class="input input-bordered w-full"
 												id="{key}-{subKey}"
 												bind:value={value[subKey]}
-												min={getInputType(subValue) === 'number' ? '0' : undefined}
 												step={getInputType(subValue) === 'number' ? 'any' : undefined}
 											/>
 										{/if}
@@ -168,7 +171,6 @@
 												class="input input-bordered w-full"
 												id="{key}-{subKey}"
 												bind:value={value[subKey]}
-												min={getInputType(subValue) === 'number' ? '0' : undefined}
 												step={getInputType(subValue) === 'number' ? 'any' : undefined}
 											/>
 										{/if}
@@ -203,58 +205,18 @@
 											class="input input-bordered w-full"
 											id="{key}-{subKey}"
 											bind:value={value[subKey]}
-											min={getInputType(subValue) === 'number' ? '0' : undefined}
 											step={getInputType(subValue) === 'number' ? 'any' : undefined}
 										/>
 									{/if}
 								</div>
 							{/if}
-						{:else if Array.isArray(subValue) && subKey === 'control_rod_positions'}
-							<div class="mt-4">
-								<label for="{key}-{subKey}" class="mb-1 block font-medium">
+						{:else if Array.isArray(subValue)}
+							<div>
+								<!-- svelte-ignore a11y_label_has_associated_control -->
+								<label class="mb-1 block font-medium">
 									{capitalizeWords(subKey)}
 								</label>
-								<div class="flex flex-wrap gap-2" id="{key}-{subKey}">
-									{#each subValue as pos, i (i)}
-										<div class="flex items-center gap-1">
-											<input
-												id="{key}-{subKey}-row-{i}"
-												type="number"
-												class="input input-bordered w-10"
-												bind:value={pos[0]}
-												min="0"
-											/>
-											<span>,</span>
-											<input
-												id="{key}-{subKey}-col-{i}"
-												type="number"
-												class="input input-bordered w-10"
-												bind:value={pos[1]}
-												min="0"
-											/>
-											<button
-												type="button"
-												class="btn btn-xs btn-error ml-1"
-												on:click={() => {
-													value[subKey].splice(i, 1);
-													// Reassign to trigger reactivity for array removal
-													value[subKey] = [...value[subKey]];
-												}}>✕</button
-											>
-										</div>
-									{/each}
-									<div class="flex items-center">
-										<button
-											type="button"
-											class="btn btn-xs btn-primary"
-											on:click={() => {
-												value[subKey].push([0, 0]);
-												// Reassign to trigger reactivity for array addition
-												value[subKey] = [...value[subKey]];
-											}}>+ Add</button
-										>
-									</div>
-								</div>
+								<ArrayEditor data={value[subKey]} />
 							</div>
 						{/if}
 					{/each}

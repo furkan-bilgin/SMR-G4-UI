@@ -39,7 +39,7 @@
 	function getLayout(): Partial<Layout> {
 		return {
 			title: {
-				text: title,
+				// text: title,
 				font: { size: 20 }
 			},
 			// Removed width and height from layout to allow chart to fit parent

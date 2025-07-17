@@ -18,16 +18,15 @@
 	// Plot files and titles
 	const plotFiles = [
 		{ file: 'event_positions.csv', title: 'Event Positions', plotType: '3dScatter' },
-		{ file: 'fission_secondary_distribution.csv', title: 'Fission Secondary Distribution' },
-		{ file: 'material_event_counts.csv', title: 'Material Event Counts' },
 		{ file: 'neutron_energies.csv', title: 'Neutron Energies' },
+		{ file: 'material_event_counts.csv', title: 'Material Event Counts' },
+		{ file: 'fission_secondary_distribution.csv', title: 'Fission Secondary Distribution' },
 		{ file: 'simulation_summary.csv', title: 'Simulation Summary' }
 	];
 
-	// Store for parsed data
 	let parsedData: Record<string, any> = {};
+	let parsedPlotData: Record<string, Data[]> = {};
 
-	// Reactive block to parse data and prepare plot data when plotData changes
 	$: if (plotData) {
 		parsedData = {};
 		for (const { file } of plotFiles) {
@@ -41,16 +40,17 @@
 
 	async function preparePlotlyData() {
 		const eventPositionsData = parsedData['event_positions.csv'];
+		// Render Fission Secondary Distribution and Neutron Energies as histograms
+		const fissionData = parsedData['fission_secondary_distribution.csv'];
+		const neutronEnergiesData = parsedData['neutron_energies.csv'];
 		if (eventPositionsData && eventPositionsData.length > 0) {
 			const eventGroup: Record<string, any> = {};
-			// Group by eventPositionsData.type to 'data'
 			eventPositionsData.forEach((d: any) => {
 				if (!eventGroup[d.type]) {
 					eventGroup[d.type] = [];
 				}
 				eventGroup[d.type].push(d);
 			});
-			// Convert to Plotly format
 			const data: Data[] = [];
 			for (const [type, points] of Object.entries(eventGroup)) {
 				const x = points.map((d: any) => parseFloat(d.x_cm));
@@ -73,7 +73,23 @@
 					showlegend: true
 				});
 			}
-			parsedData['event_positions.csv'] = data;
+			parsedPlotData['event_positions.csv'] = data;
+		}
+		if (fissionData && fissionData.length > 0) {
+			parsedPlotData['fission_secondary_distribution.csv'] = [
+				{
+					x: fissionData.map((d: any) => parseFloat(d.secondary_count)),
+					type: 'histogram'
+				}
+			];
+		}
+		if (neutronEnergiesData && neutronEnergiesData.length > 0) {
+			parsedPlotData['neutron_energies.csv'] = [
+				{
+					x: neutronEnergiesData.map((d: any) => parseFloat(d.energy_MeV)),
+					type: 'histogram'
+				}
+			];
 		}
 	}
 
@@ -93,35 +109,31 @@
 		{#each plotFiles as { file, title, plotType }}
 			<div class="bg-base-200 rounded-lg border p-4">
 				<h3 class="mb-2 font-semibold">{title}</h3>
-				{#if parsedData[file]?.length || parsedData[file]?.x?.length}
-					{#if file === 'event_positions.csv'}
-						<div class="pb-4">
-							<Plotly data={parsedData[file]} />
-						</div>
-					{:else}
-						<div class="overflow-x-auto">
-							<table class="table-zebra table-xs table">
-								<thead>
+				{#if parsedPlotData[file]}
+					<div class="pb-4">
+						<Plotly data={parsedPlotData[file]} />
+					</div>
+				{:else}
+					<div class="overflow-x-auto">
+						<table class="table-zebra table-xs table">
+							<thead>
+								<tr>
+									{#each Object.keys(parsedData[file][0]) as col}
+										<th>{col}</th>
+									{/each}
+								</tr>
+							</thead>
+							<tbody>
+								{#each parsedData[file] as row}
 									<tr>
-										{#each Object.keys(parsedData[file][0]) as col}
-											<th>{col}</th>
+										{#each Object.values(row) as val}
+											<td>{val}</td>
 										{/each}
 									</tr>
-								</thead>
-								<tbody>
-									{#each parsedData[file] as row}
-										<tr>
-											{#each Object.values(row) as val}
-												<td>{val}</td>
-											{/each}
-										</tr>
-									{/each}
-								</tbody>
-							</table>
-						</div>
-					{/if}
-				{:else}
-					<span class="text-sm text-gray-400">No data available.</span>
+								{/each}
+							</tbody>
+						</table>
+					</div>
 				{/if}
 			</div>
 		{/each}
