@@ -51,6 +51,7 @@
 			random_direction: false
 		}
 	};
+	config = { ...config, event_count: 1000 };
 	let isSubmitting = false;
 	let availableMaterials: string[] = [
 		'G4_WATER',
@@ -108,6 +109,19 @@
 					<option value="box">Box</option>
 					<option value="sphere">Sphere</option>
 				</select>
+			</div>
+			<div class="flex items-end">
+				<div>
+					<label for="eventCount" class="mb-1 block font-medium">Event Count</label>
+					<input
+						type="number"
+						class="input input-bordered w-full"
+						id="eventCount"
+						bind:value={config.event_count}
+						min="1"
+						step="1"
+					/>
+				</div>
 			</div>
 		</div>
 	</section>
