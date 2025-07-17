@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import ScatterPlot from '$lib/ScatterPlot.svelte';
+	import Plotly from '$lib/Plotly.svelte';
+	import type { Data } from 'plotly.js-dist-min';
 
 	export let plotData: Record<string, string> | null = null;
 
@@ -41,10 +42,38 @@
 	async function preparePlotlyData() {
 		const eventPositionsData = parsedData['event_positions.csv'];
 		if (eventPositionsData && eventPositionsData.length > 0) {
-			const x = eventPositionsData.map((d: any) => parseFloat(d.x_cm));
-			const y = eventPositionsData.map((d: any) => parseFloat(d.y_cm));
-			const z = eventPositionsData.map((d: any) => parseFloat(d.z_cm));
-			parsedData['event_positions.csv'] = { x, y, z };
+			const eventGroup: Record<string, any> = {};
+			// Group by eventPositionsData.type to 'data'
+			eventPositionsData.forEach((d: any) => {
+				if (!eventGroup[d.type]) {
+					eventGroup[d.type] = [];
+				}
+				eventGroup[d.type].push(d);
+			});
+			// Convert to Plotly format
+			const data: Data[] = [];
+			for (const [type, points] of Object.entries(eventGroup)) {
+				const x = points.map((d: any) => parseFloat(d.x_cm));
+				const y = points.map((d: any) => parseFloat(d.y_cm));
+				const z = points.map((d: any) => parseFloat(d.z_cm));
+				const colorValue = points.map((d: any) => (d.type === 'CAPTURE' ? 'blue' : 'red'));
+				data.push({
+					x,
+					y,
+					z,
+					mode: 'markers',
+					type: 'scatter3d',
+					marker: {
+						size: 3,
+						opacity: 0.8,
+						color: colorValue,
+						colorscale: 'Viridis'
+					},
+					name: type,
+					showlegend: true
+				});
+			}
+			parsedData['event_positions.csv'] = data;
 		}
 	}
 
@@ -67,7 +96,7 @@
 				{#if parsedData[file]?.length || parsedData[file]?.x?.length}
 					{#if file === 'event_positions.csv'}
 						<div class="pb-4">
-							<ScatterPlot data={parsedData[file]} />
+							<Plotly data={parsedData[file]} />
 						</div>
 					{:else}
 						<div class="overflow-x-auto">

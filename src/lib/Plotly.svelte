@@ -2,17 +2,23 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { Layout, Data, Config } from 'plotly.js';
 
-	export let data: {
-		x: number[];
-		y: number[];
-		z: number[];
-		colorValue?: (number | string)[];
-	} = {
-		x: [1, 2, 3, 4, 5, 6, 7, 8],
-		y: [2, 3, 4, 5, 6, 7, 8, 9],
-		z: [3, 4, 5, 6, 7, 8, 9, 10],
-		colorValue: [10, 20, 30, 40, 50, 'red', 'green', 'blue']
-	};
+	export let data: Data[] = [
+		{
+			x: [1, 2, 3],
+			y: [4, 5, 6],
+			z: [7, 8, 9],
+			mode: 'markers',
+			type: 'scatter3d',
+			marker: {
+				size: 3,
+				opacity: 0.8,
+				color: ['red', 'green', 'blue'],
+				colorscale: 'Viridis'
+			},
+			name: 'Data Points',
+			showlegend: true
+		}
+	];
 
 	export let title: string = 'Interactive 3D Scatter Plot';
 	export let xAxisTitle: string = 'X-Axis';
@@ -29,26 +35,6 @@
 	let plotlyInstance: Plotly.PlotlyHTMLElement | null = null;
 	let Plotly: typeof import('plotly.js-dist-min');
 	let isLoading: boolean = true;
-
-	function getPlotlyData(): Data[] {
-		return [
-			{
-				x: data.x,
-				y: data.y,
-				z: data.z,
-				mode: 'markers',
-				type: 'scatter3d',
-				marker: {
-					size: markerSize,
-					opacity: markerOpacity,
-					color: data.colorValue,
-					colorscale: typeof markerColorScale === 'string' ? markerColorScale : undefined
-				},
-				name: 'Data Points',
-				showlegend: false
-			}
-		];
-	}
 
 	function getLayout(): Partial<Layout> {
 		return {
@@ -75,13 +61,20 @@
 				r: 0,
 				t: 0,
 				b: 0
+			},
+			legend: {
+				x: 1,
+				xanchor: 'right',
+				y: 1
 			}
 		};
 	}
 
 	function getPlotlyConfig(): Partial<Config> {
 		return {
-			responsive: true
+			responsive: true,
+			displayModeBar: false,
+			displaylogo: false
 		};
 	}
 
@@ -90,11 +83,9 @@
 			Plotly = await import('plotly.js-dist-min');
 			isLoading = false;
 
-			await Plotly.newPlot(plotDiv, getPlotlyData(), getLayout(), getPlotlyConfig()).then(
-				(instance) => {
-					plotlyInstance = instance;
-				}
-			);
+			await Plotly.newPlot(plotDiv, data, getLayout(), getPlotlyConfig()).then((instance) => {
+				plotlyInstance = instance;
+			});
 		} catch (error) {
 			console.error('Error loading or creating Plotly plot:', error);
 			isLoading = false;
@@ -103,7 +94,7 @@
 
 	$: if (plotlyInstance && Plotly) {
 		try {
-			Plotly.react(plotDiv, getPlotlyData(), getLayout(), getPlotlyConfig());
+			Plotly.react(plotDiv, data, getLayout(), getPlotlyConfig());
 		} catch (error) {
 			console.error('Error updating Plotly plot:', error);
 		}
@@ -123,7 +114,7 @@
 <div bind:this={plotDiv} class="h-full w-full" style="min-height: 400px; overflow: hidden;">
 	{#if isLoading}
 		<p class="text-gray-600">Loading 3D Plot...</p>
-	{:else if !data || data.x.length === 0}
+	{:else if !data}
 		<p class="text-gray-600">No data available to plot.</p>
 	{/if}
 </div>
