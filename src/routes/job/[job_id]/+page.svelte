@@ -11,6 +11,7 @@
 	let jobOutputContainer: HTMLPreElement;
 	let jobGeometry: string | null = null;
 	let jobPlotData: any | null = null;
+	let fullScreenPlots = false;
 
 	$: {
 		if (jobOutput && jobOutputContainer) {
@@ -55,10 +56,6 @@
 		}
 		jobPlotData = data;
 	}
-	const dataxyz = {
-		x: [1, 2, 3, 4, 5],
-		y: [1, 2, 4, 8, 16]
-	};
 
 	async function getJob() {
 		try {
@@ -93,7 +90,7 @@
 <span class="mb-4 text-2xl">Job #{jobId}</span>
 
 <section class="flex w-full flex-row justify-between gap-3">
-	<div class="flex flex-1/3 flex-col">
+	<div class="flex flex-1/3 flex-col {fullScreenPlots ? 'hidden' : ''}">
 		<span class="mb-2 border-b-2 border-gray-300 pb-1 text-xl shadow-sm">Output</span>
 		{#if job instanceof Error}
 			<span>Error fetching job: {job.message}</span>
@@ -131,7 +128,7 @@
 			{/if}
 		{/if}
 	</div>
-	<div class="flex flex-1/3 flex-col">
+	<div class="flex flex-1/3 flex-col {fullScreenPlots ? 'hidden' : ''}">
 		<span class="mb-2 border-b-2 border-gray-300 pb-1 text-xl shadow-sm">Geometry</span>
 		{#if jobGeometry}
 			<DawnFileRenderer primText={jobGeometry} />
@@ -142,7 +139,19 @@
 		{/if}
 	</div>
 	<div class="flex flex-1/3 flex-col">
-		<span class="mb-2 border-b-2 border-gray-300 pb-1 text-xl shadow-sm">Plots</span>
+		<span class="mb-2 flex justify-between border-b-2 border-gray-300 pb-1 text-xl shadow-sm">
+			Plots
+			{#if !fullScreenPlots}
+				<button on:click={() => (fullScreenPlots = true)} aria-label="View plots in full screen">
+					<i class="fa-solid fa-expand"></i>
+				</button>
+			{:else}
+				<button on:click={() => (fullScreenPlots = false)} aria-label="Exit full screen plots">
+					<i class="fa-solid fa-compress"></i>
+				</button>
+			{/if}
+		</span>
+
 		{#if jobPlotData}
 			<PlotRenderer plotData={jobPlotData} />
 		{:else}

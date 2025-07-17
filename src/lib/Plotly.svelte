@@ -20,14 +20,9 @@
 		}
 	];
 
-	export let title: string = 'Interactive 3D Scatter Plot';
 	export let xAxisTitle: string = 'X-Axis';
 	export let yAxisTitle: string = 'Y-Axis';
 	export let zAxisTitle: string = 'Z-Axis';
-
-	export let markerSize: number = 3;
-	export let markerOpacity: number = 0.8;
-	export let markerColorScale: string | string[] = 'Viridis';
 
 	export let plotBackgroundColor: string = '#f8f8f8';
 

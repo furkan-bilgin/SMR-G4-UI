@@ -110,19 +110,21 @@
 					<option value="sphere">Sphere</option>
 				</select>
 			</div>
-			<div class="flex items-end">
-				<div>
-					<label for="eventCount" class="mb-1 block font-medium">Event Count</label>
-					<input
-						type="number"
-						class="input input-bordered w-full"
-						id="eventCount"
-						bind:value={config.event_count}
-						min="1"
-						step="1"
-					/>
+			{#each [{ key: 'core_height_cm', label: 'Core Height (cm)' }, { key: 'core_radius_cm', label: 'Core Radius (cm)' }, { key: 'event_count', label: 'Event Count' }] as field}
+				<div class="flex items-end">
+					<div class="w-full">
+						<label for={field.key} class="mb-1 block font-medium">{field.label}</label>
+						<input
+							type="number"
+							class="input input-bordered w-full"
+							id={field.key}
+							bind:value={config[field.key]}
+							min={field.key === 'event_count' ? 1 : undefined}
+							step="any"
+						/>
+					</div>
 				</div>
-			</div>
+			{/each}
 		</div>
 	</section>
 	<hr class="my-3" />
