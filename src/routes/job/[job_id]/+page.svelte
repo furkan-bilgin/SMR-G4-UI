@@ -94,8 +94,7 @@
 
 <section class="flex w-full flex-row justify-between gap-3">
 	<div class="flex flex-1/3 flex-col">
-		<span class="mb-2 text-xl">Output</span>
-		<div class="mb-2 flex flex-row items-center justify-between"></div>
+		<span class="mb-2 border-b-2 border-gray-300 pb-1 text-xl shadow-sm">Output</span>
 		{#if job instanceof Error}
 			<span>Error fetching job: {job.message}</span>
 		{:else if job === null}
@@ -107,14 +106,33 @@
 				class="max-w-xl overflow-y-auto rounded-lg p-4 font-mono text-sm"
 				style="max-height: 600px;"
 				bind:this={jobOutputContainer}>{jobOutput}
-				{#if job.completed_at}
-					<p class="text-sm text-green-300">Job completed at {job.completed_at}</p>
-				{/if}
-      </pre>
+			</pre>
+			{#if job.completed_at}
+				<p class="flex items-center gap-2 text-sm text-green-300">
+					Job completed at {job.completed_at}
+					<button
+						class="btn btn-sm btn-secondary flex items-center"
+						on:click={() => {
+							const blob = new Blob([jobOutput], { type: 'text/plain' });
+							const url = URL.createObjectURL(blob);
+							const a = document.createElement('a');
+							a.href = url;
+							a.download = `job_${jobId}_output.txt`;
+							document.body.appendChild(a);
+							a.click();
+							document.body.removeChild(a);
+							URL.revokeObjectURL(url);
+						}}
+						aria-label="Download job output"
+						disabled={!jobOutput}
+						><i class="fa-solid fa-download"></i>
+					</button>
+				</p>
+			{/if}
 		{/if}
 	</div>
 	<div class="flex flex-1/3 flex-col">
-		<span class="mb-2 text-xl">Geometry</span>
+		<span class="mb-2 border-b-2 border-gray-300 pb-1 text-xl shadow-sm">Geometry</span>
 		{#if jobGeometry}
 			<DawnFileRenderer primText={jobGeometry} />
 		{:else}
@@ -124,7 +142,7 @@
 		{/if}
 	</div>
 	<div class="flex flex-1/3 flex-col">
-		<span class="mb-2 text-xl">Plots</span>
+		<span class="mb-2 border-b-2 border-gray-300 pb-1 text-xl shadow-sm">Plots</span>
 		{#if jobPlotData}
 			<PlotRenderer plotData={jobPlotData} />
 		{:else}

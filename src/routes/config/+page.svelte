@@ -4,8 +4,6 @@
 
 	export let config: Record<string, any> = {
 		core_shape: 'cylinder',
-		core_height_cm: 300.0,
-		core_radius_cm: 150.0,
 
 		fuel_pins: {
 			layout: 'square',
