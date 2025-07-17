@@ -17,7 +17,7 @@
 
 	async function deleteJob(jobId: string) {
 		try {
-			await api.delete(`/jobs/${jobId}`);
+			await api.post(`/jobs/${jobId}/delete`);
 			await fetchJobs();
 		} catch (err) {
 			console.error('Error deleting job:', err);
