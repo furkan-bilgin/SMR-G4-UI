@@ -5,11 +5,8 @@
 	let structureEditable = false;
 
 	$: {
-		console.log('Data changed:', !!data.length);
-
 		// Disallow editing of 1-dimensional arrays
 		structureEditable = data[0] && Array.isArray(data[0]);
-		console.log('Structure editable:', structureEditable);
 	}
 
 	function capitalizeWords(str: string) {
@@ -39,7 +36,7 @@
 			} else if (typeof firstItem === 'string') {
 				newItem = '';
 			} else {
-				newItem = null; // Fallback
+				newItem = 0; // Fallback
 			}
 		} else {
 			newItem = 0;

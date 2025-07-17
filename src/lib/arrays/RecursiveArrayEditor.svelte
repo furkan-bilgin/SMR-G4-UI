@@ -35,7 +35,7 @@
 			} else if (typeof firstItem === 'string') {
 				newItem = ''; // If array contains strings, add an empty string
 			} else {
-				newItem = null; // Fallback for other types
+				newItem = 0; // Fallback for other types
 			}
 		} else {
 			newItem = 0;
@@ -78,24 +78,13 @@
 			{/each}
 		</div>
 	</div>
-{:else if typeof value === 'number'}
+{:else}
 	<input
 		id={uniqueId}
 		type="number"
+		required
 		class="input input-bordered w-10 rounded-md border border-gray-700 bg-gray-900 px-2 py-1 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 		bind:value
 		on:input={() => dispatch('change', value)}
 	/>
-{:else if typeof value === 'string'}
-	<input
-		id={uniqueId}
-		type="text"
-		class="input input-bordered w-16 rounded-md border border-gray-700 bg-gray-900 px-2 py-1 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-		bind:value
-		on:input={() => dispatch('change', value)}
-	/>
-{:else}
-	<span id={uniqueId} class="rounded-md border border-gray-700 bg-gray-900 p-2 text-gray-400">
-		{JSON.stringify(value)}
-	</span>
 {/if}
