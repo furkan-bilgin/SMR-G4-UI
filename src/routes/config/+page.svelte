@@ -232,7 +232,7 @@
 								<label class="mb-1 block font-medium">
 									{capitalizeWords(subKey)}
 								</label>
-								<ArrayEditor data={value[subKey]} />
+								<ArrayEditor bind:data={value[subKey]} />
 							</div>
 						{/if}
 					{/each}

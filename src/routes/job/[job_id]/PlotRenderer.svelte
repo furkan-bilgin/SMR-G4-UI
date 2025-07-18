@@ -130,7 +130,6 @@
 
 	let gridElementWidth: number | null = null;
 	let useFlex = false;
-
 	$: useFlex = gridElementWidth ? gridElementWidth < 500 : false;
 </script>
 
