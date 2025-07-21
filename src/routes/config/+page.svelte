@@ -52,6 +52,38 @@
 		}
 	};
 	config = { ...config, event_count: 1000 };
+	let configTypes: any = {};
+	onMount(() => {
+		// Extract types from config
+		function extractTypes(obj: any, typeObj: any) {
+			for (const key in obj) {
+				if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+					typeObj[key] = {};
+					extractTypes(obj[key], typeObj[key]);
+				} else {
+					typeObj[key] = typeof obj[key];
+				}
+			}
+		}
+		extractTypes(config, configTypes);
+	});
+
+	function resolveTypes(obj: any, types: any) {
+		for (const key in obj) {
+			if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+				resolveTypes(obj[key], types[key]);
+			} else if (typeof obj[key] !== types[key]) {
+				if (types[key] === 'number') {
+					obj[key] = parseFloat(obj[key]);
+				} else if (types[key] === 'boolean') {
+					obj[key] = obj[key] === 'true' || obj[key] === true;
+				} else if (types[key] === 'string') {
+					obj[key] = String(obj[key]);
+				}
+			}
+		}
+	}
+
 	let isSubmitting = false;
 	let availableMaterials: string[] = [
 		'G4_WATER',
@@ -77,6 +109,8 @@
 	}
 
 	function handleSubmit() {
+		// Ensure that config has fields that are compatible
+		resolveTypes(config, configTypes);
 		isSubmitting = true;
 		api.post('/schedule', { job_config: config }).then((res: any) => {
 			window.location.href = `/SMR-G4/job/${res.data.job_id}`;
