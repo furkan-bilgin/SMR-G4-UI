@@ -87,24 +87,23 @@
 					name: type,
 					showlegend: true
 				});
-				if (points.length > 0) {
-					xyData.push({
-						x,
-						y,
-						mode: 'markers',
-						type: 'scatter',
-						marker: { size: 6, color: colorValue, symbol: 'x' },
-						name: type
-					});
-					xzData.push({
-						x,
-						z,
-						mode: 'markers',
-						type: 'scatter',
-						marker: { size: 6, color: colorValue, symbol: 'x' },
-						name: type
-					});
-				}
+
+				xyData.push({
+					x,
+					y,
+					mode: 'markers',
+					type: 'scattergl',
+					marker: { size: 6, color: colorValue, symbol: 'x' },
+					name: type
+				});
+				xzData.push({
+					x,
+					z,
+					mode: 'markers',
+					type: 'scattergl',
+					marker: { size: 6, color: colorValue, symbol: 'x' },
+					name: type
+				});
 			}
 			parsedPlotData['event_positions.csv'] = data;
 			parsedPlotData['event_positions_xy.csv'] = xyData;
